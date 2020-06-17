@@ -25,11 +25,25 @@ character_height = character_size[1]
 character_x_pos = (screen_width/2) - character_width/2
 character_y_pos = screen_height - character_height
 
+# Enemy setup
+enemy = pygame.image.load("enemy.png")
+enemy_size = enemy.get_rect().size
+enemy_width = enemy_size[0]
+enemy_height = enemy_size[1]
+enemy_x_pos = (screen_width/2) - (enemy_width/2)
+enemy_y_pos = (screen_height/2) - (enemy_height/2)
+
 # Amounts the character moves
 to_x = 0
 to_y = 0
-
 character_speed = .6
+
+# Font setup
+game_font = pygame.font.Font(None, 40)
+
+# Game time
+total_time = 10
+start_ticks = pygame.time.get_ticks()
 
 # Event Loop
 running = True # Is the game running?
@@ -69,14 +83,43 @@ while running:
     elif character_y_pos > screen_height - character_height:
         character_y_pos = screen_height - character_height
 
+    # Get character and enemy's rectangle info (top, left, width, height)
+    # So update top and left info
+    character_rect = character.get_rect()
+    character_rect.left = character_x_pos
+    character_rect.top = character_y_pos
+
+    enemy_rect = enemy.get_rect()
+    enemy_rect.left = enemy_x_pos
+    enemy_rect.top = enemy_y_pos
+
+    # Handle collision
+    if character_rect.colliderect(enemy_rect):
+        print("Collided")
+        running = false
+
+    # Update Character's position
     character_x_pos += to_x * frame
     character_y_pos += to_y * frame
 
+    # Clock
+    elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
+    timer = game_font.render(str(int(total_time - elapsed_time)), True, (255, 255, 255))
+    
+    # Draw elements on the screen
     screen.blit(background, (0, 0))
-
     screen.blit(character, (character_x_pos, character_y_pos))
+    screen.blit(enemy, (enemy_x_pos, enemy_y_pos))
+    screen.blit(timer, (10, 10))
 
+    if total_time - elapsed_time <= 0:
+        print("Time out")
+        running = False
+
+    # Update display
     pygame.display.update()
+
+pygame.time.delay(2000)
 
 # Exit the game
 pygame.quit()
