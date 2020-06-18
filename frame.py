@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Initialize
 pygame.init() 
@@ -30,19 +31,19 @@ enemy = pygame.image.load("enemy.png")
 enemy_size = enemy.get_rect().size
 enemy_width = enemy_size[0]
 enemy_height = enemy_size[1]
-enemy_x_pos = (screen_width/2) - (enemy_width/2)
-enemy_y_pos = (screen_height/2) - (enemy_height/2)
+enemy_x_pos = random.randint(0, screen_width - enemy_width)
+enemy_y_pos = 0
+enemy_speed = 5
 
 # Amounts the character moves
 to_x = 0
-to_y = 0
 character_speed = .6
 
 # Font setup
 game_font = pygame.font.Font(None, 40)
 
 # Game time
-total_time = 10
+total_time = 60
 start_ticks = pygame.time.get_ticks()
 
 # Event Loop
@@ -60,28 +61,21 @@ while running:
                 to_x -= character_speed
             elif event.key == pygame.K_RIGHT:
                 to_x += character_speed
-            elif event.key == pygame.K_UP:
-                to_y -= character_speed
-            elif event.key == pygame.K_DOWN:
-                to_y += character_speed
-    
+
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 to_x = 0
-            elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                to_y = 0
 
     # Left and right limit
     if character_x_pos < 0:
         character_x_pos = 0
     elif character_x_pos > screen_width - character_width:
         character_x_pos = screen_width - character_width
-    
-    # Left and right limit
-    if character_y_pos < 0:
-        character_y_pos = 0
-    elif character_y_pos > screen_height - character_height:
-        character_y_pos = screen_height - character_height
+
+    # Enemy position reset
+    if enemy_y_pos > screen_height:
+        enemy_y_pos = 0
+        enemy_x_pos = random.randint(0, screen_width - enemy_width)
 
     # Get character and enemy's rectangle info (top, left, width, height)
     # So update top and left info
@@ -100,7 +94,9 @@ while running:
 
     # Update Character's position
     character_x_pos += to_x * frame
-    character_y_pos += to_y * frame
+
+    # Update Enemy's position
+    enemy_y_pos += enemy_speed
 
     # Clock
     elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
